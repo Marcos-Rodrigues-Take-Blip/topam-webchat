@@ -43,7 +43,7 @@
         (function () {
             window.onload = function () {
                 
-                // 1. Captura os parâmetros passados na URL do seu navegador
+                // 1. Captura os parâmetros passados na URL
                 const urlParams = new URLSearchParams(window.location.search);
                 const userPhone = urlParams.get('phone'); 
                 const userName = urlParams.get('name');   
@@ -52,10 +52,20 @@
                 var blipClient = new BlipChat()
                     .withAppKey('Z3J1cG9hZ3Vhc2JyYXNpbDpjNTIyMTNmZS0xMTlmLTRjZmUtYWIzYS03NDkyYzI2M2QzYzY=')
                     .withCustomCommonUrl('https://valuedesignsmb.chat.blip.ai/')
-                    .withTarget('meu-chat-tela-cheia'); // <--- A MÁGICA DO ARTIGO ESTÁ AQUI
+                    .withTarget('meu-chat-tela-cheia'); 
 
                 // 3. Aplica a lógica se os dados existirem na URL
                 if (userPhone) {
+                    
+                    // --- NOVA PARTE: AUTENTICAÇÃO DEV_AUTH ---
+                    blipClient.withAuth({
+                        authType: BlipChat.DEV_AUTH,
+                        userIdentity: userPhone,
+                        userPassword: userPhone // A senha é obrigatória. Aqui usamos o próprio telefone, mas pode ser um valor fixo, ex: 'blip123'
+                    });
+                    // -----------------------------------------
+
+                    // Define as informações extras da conta no Blip
                     blipClient.withAccount({
                         fullName: userName || 'Usuário Anonimo',
                         phoneNumber: userPhone,
@@ -66,7 +76,7 @@
                     });
                 }
 
-                // 4. Constrói o chat (ele já renderiza aberto e gigante na tela)
+                // 4. Constrói o chat na tela
                 blipClient.build();
             }
         })();
