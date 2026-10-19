@@ -43,29 +43,34 @@
         (function () {
             window.onload = function () {
                 
-                // 1. Captura os parâmetros passados na URL
+                // 1. Captura os parâmetros passados na URL (lembre-se do '?')
                 const urlParams = new URLSearchParams(window.location.search);
                 const userPhone = urlParams.get('phone'); 
                 const userName = urlParams.get('name');   
 
-                // 2. Instancia o Blip Chat apontando para a nossa DIV alvo
+                // 2. Instancia o Blip Chat apontando para a nossa DIV e adicionando o Evento
                 var blipClient = new BlipChat()
                     .withAppKey('Z3J1cG9hZ3Vhc2JyYXNpbDpjNTIyMTNmZS0xMTlmLTRjZmUtYWIzYS03NDkyYzI2M2QzYzY=')
                     .withCustomCommonUrl('https://valuedesignsmb.chat.blip.ai/')
-                    .withTarget('meu-chat-tela-cheia'); 
-
-                // 3. Aplica a lógica se os dados existirem na URL
-                if (userPhone) {
-                    
-                    // --- NOVA PARTE: AUTENTICAÇÃO DEV_AUTH ---
-                    blipClient.withAuth({
-                        authType: BlipChat.DEV_AUTH,
-                        userIdentity: userPhone,
-                        userPassword: userPhone // A senha é obrigatória. Aqui usamos o próprio telefone, mas pode ser um valor fixo, ex: 'blip123'
+                    .withTarget('meu-chat-tela-cheia')
+                    // --- NOVA PARTE: EVENT HANDLER DE LOAD ---
+                    .withEventHandler(BlipChat.LOAD_EVENT, function () {
+                        blipClient.sendMessage({
+                            "type": "text/plain",
+                            "content": "Start" // Você pode alterar essa palavra se seu bot exigir outra
+                        });
                     });
                     // -----------------------------------------
 
-                    // Define as informações extras da conta no Blip
+                // 3. Aplica a lógica de Autenticação (DEV_AUTH) e Account se os dados existirem na URL
+                if (userPhone) {
+                    
+                    blipClient.withAuth({
+                        authType: BlipChat.DEV_AUTH,
+                        userIdentity: userPhone,
+                        userPassword: userPhone // A senha usada é o próprio telefone neste caso
+                    });
+
                     blipClient.withAccount({
                         fullName: userName || 'Usuário Anonimo',
                         phoneNumber: userPhone,
